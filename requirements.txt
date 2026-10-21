@@ -1,0 +1,11 @@
+langchain
+llama-index
+sqlalchemy
+psycopg2-binary
+langchain-community
+python-dotenv
+langchain-openai
+langchain-pinecone
+pinecone
+pypdf
+langsmith
