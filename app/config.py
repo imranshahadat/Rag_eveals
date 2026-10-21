@@ -15,7 +15,7 @@ class Settings:
     NOVITA_API_KEY = os.getenv("NOVITA_API_KEY")
     DATABASE_URL = os.getenv("DATABASE_URL")
     
-    MODEL_NAME = "inclusionai/ling-3.0-flash-sante"
+    MODEL_NAME = "apodex/apodex-1.1-mini"
     NOVITA_BASE_URL = "https://api.novita.ai/openai"
     
     PINECONE_INDEX_NAME = "colabragindex"
