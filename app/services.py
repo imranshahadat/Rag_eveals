@@ -18,16 +18,19 @@ class DocumentSplitter:
 @tool("analyze_user_query", description="Analyze user inquiries about CV or health.")
 def get_information(user_message: str) -> str:
     return f"Processed query: {user_message}"
-
 class ResumeAssistant:
     def __init__(self, llm, retriever, memory=None):
         from app.memory import ChatMemoryManager
         self.retriever = retriever
-        self.llm = llm.bind_tools([get_information])
+        
+        # FIX: Removed .bind_tools() so the model returns plain text streams
+        self.llm = llm  
+        
         self.memory = memory or ChatMemoryManager(llm=llm)
 
+        # Updated system prompt to handle empty context gracefully
         self.prompt = ChatPromptTemplate.from_messages([
-            ("system", "Answer the user's question using only the following retrieved context:\n\n{context}"),
+            ("system", "You are a helpful assistant. Answer the user's question using the following retrieved context. If the context is empty or irrelevant, politely state that you don't have that information in your documents yet.\n\nContext:\n{context}"),
             MessagesPlaceholder("chat_history"),
             ("user", "{user_message}")
         ])
@@ -36,6 +39,8 @@ class ResumeAssistant:
         return user_message.strip()
 
     def _format_docs(self, docs):
+        if not docs:
+            return "No relevant context found."
         return "\n\n".join(doc.page_content for doc in docs)
 
     @traceable(name="Resume RAG Pipeline Stream", run_type="chain", tags=["rag", "streaming", "memory"])
@@ -55,11 +60,53 @@ class ResumeAssistant:
 
         full_response = ""
         for chunk in self.llm.stream(formatted_prompt):
-            content = chunk.content
+            # Safely get content, defaulting to empty string if None
+            content = chunk.content if chunk.content else ""
             full_response += content
             yield content
 
         self.memory.add_ai_message(full_response)
+# class ResumeAssistant:
+#     def __init__(self, llm, retriever, memory=None):
+#         from app.memory import ChatMemoryManager
+#         self.retriever = retriever
+#         self.llm = llm.bind_tools([get_information])
+#         self.memory = memory or ChatMemoryManager(llm=llm)
+
+#         self.prompt = ChatPromptTemplate.from_messages([
+#             ("system", "Answer the user's question using only the following retrieved context:\n\n{context}"),
+#             MessagesPlaceholder("chat_history"),
+#             ("user", "{user_message}")
+#         ])
+
+#     def preprocess_message(self, user_message: str) -> str:
+#         return user_message.strip()
+
+#     def _format_docs(self, docs):
+#         return "\n\n".join(doc.page_content for doc in docs)
+
+#     @traceable(name="Resume RAG Pipeline Stream", run_type="chain", tags=["rag", "streaming", "memory"])
+#     def stream_message(self, user_message: str):
+#         cleaned_message = self.preprocess_message(user_message)
+#         self.memory.add_user_message(cleaned_message)
+
+#         context_docs = self.retriever.invoke(cleaned_message)
+#         context = self._format_docs(context_docs)
+#         chat_history = self.memory.get_context_messages()
+
+#         formatted_prompt = self.prompt.invoke({
+#             "context": context,
+#             "chat_history": chat_history,
+#             "user_message": cleaned_message
+#         })
+
+#         full_response = ""
+#         for chunk in self.llm.stream(formatted_prompt):
+#             content = chunk.content
+#             full_response += content
+#             yield content
+
+#         self.memory.add_ai_message(full_response)
 
 class IngestionService:
     def __init__(self, vector_store):

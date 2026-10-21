@@ -13,7 +13,7 @@ class OpenAIModel:
                 openai_api_key=api_key,
                 openai_api_base=base_url,
                 temperature=0.8,
-                max_tokens=12000
+                max_tokens=3000
             )
             log_msg(f"Novita LLM ({model_name}) initialized successfully")
             print(f"Novita LLM ({model_name}) initialized")
