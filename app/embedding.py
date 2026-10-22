@@ -15,7 +15,7 @@ class VercelEmbeddings:
         api_key: str = None,
         base_url: str = None
     ):
-        self.model_name = model_name or os.getenv("VERCEL_EMBEDDING_MODEL", "text-embedding-3-small")
+        self.model_name = model_name or os.getenv("VERCEL_EMBEDDING_MODEL")
         self.api_key = api_key or os.getenv("VERCEL_AI_GATEWAY_API_KEY")
         self.base_url = base_url or os.getenv("VERCEL_AI_GATEWAY_BASE_URL", "https://ai-gateway.vercel.sh/v1")
 

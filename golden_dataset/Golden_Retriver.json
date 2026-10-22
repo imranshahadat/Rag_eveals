@@ -1,0 +1,98 @@
+{
+  "dataset_name": "UN_Children_Armed_Conflict_Afghanistan_S_2026_728_Evals_Advanced",
+  "source_document": "Children and armed conflict in Afghanistan : report of the Secretary-General (S/2026/728)",
+  "evaluation_metrics_targeted": ["context_recall", "context_precision", "faithfulness", "answer_relevance"],
+  "test_cases": [
+    {
+      "id": "Q7",
+      "test_type": "Temporal Tracking Shift Trap",
+      "question": "What is the exact timeframe covered by the Secretary-General report under document symbol S/2026/728 for tracking grave child violations?",
+      "ground_truth": "1 January 2023 to 31 December 2025.",
+      "trick_distractor_challenge": "Tests whether your retriever confuses this updated report with the historical 2021-2022 report (S/2023/893). A weak retriever will bring up old chunks containing the 2021-2022 window instead of the 2023-2025 data."
+    },
+    {
+      "id": "Q8",
+      "test_type": "Percentage Change vs. Absolute Metric Trap",
+      "question": "By what precise percentage did incidents regarding the denial of humanitarian access increase compared to the prior reporting cycle, and what was the final recorded absolute number of these incidents?",
+      "ground_truth": "Denial of humanitarian access increased by 189%, totaling 2,241 verified incidents.",
+      "trick_distractor_challenge": "LLMs often mix up percentages with baseline counts. This forces the model to fetch and link two distinct variables (189% and 2,241) embedded within the text without swap-hallucinating them with the recruitment rate metrics."
+    },
+    {
+      "id": "Q9",
+      "test_type": "Exclusive Entity Attribution Trap",
+      "question": "Which specific factions or armed groups were held explicitly responsible for the 557 verified cases of child recruitment and use during the 2023-2025 period?",
+      "ground_truth": "All 557 verified cases of child recruitment were entirely attributed to the Taliban.",
+      "trick_distractor_challenge": "The text states 'all by the Taliban'. Many models rely on generic context from previous conflicts and hallucinate secondary attribution to other active factions like ISIL-KP or local militias. This evaluates strict alignment to exclusive data."
+    },
+    {
+      "id": "Q10",
+      "test_type": "Compound Multi-Category Target Aggregation Trap",
+      "question": "What was the combined total number of verified incidents involving attacks targeting educational institutions and healthcare facilities?",
+      "ground_truth": "338 total attacks (comprising 163 attacks on schools and 175 attacks on hospitals).",
+      "trick_distractor_challenge": "This is a severe structural stress-test for RAG chunk boundaries. The text splits the subcategories into separate numbers (163 and 175). The model must find both individual sub-metrics, accurately aggregate them, or locate the document's total compound metric (338)."
+    },
+    {
+      "id": "Q11",
+      "test_type": "Gender-Disaggregated Out-of-Bounds Trap",
+      "question": "How many verified girls were documented as being recruited or utilized by armed forces according to the 2023-2025 report figures?",
+      "ground_truth": "Zero (The 557 verified cases of recruitment and use explicitly consisted entirely of boys).",
+      "trick_distractor_challenge": "Tests the model's granular constraint verification. If the retriever poorly maps gender divisions, the LLM will assume the 557 total includes a mixed distribution of boys and girls or completely skip over the specific zero-value for girls."
+    },
+    {
+      "id": "Q12",
+      "test_type": "Causal Attribution Extraction Trap",
+      "question": "What primary mechanism or weapon category was responsible for the vast majority (80%) of the 1,415 child casualties involving killing and maiming?",
+      "ground_truth": "Explosive ordnance (including explosive remnants of war).",
+      "trick_distractor_challenge": "Forces the RAG chain to perform a causal lookup. Weak systems capture the high casualty number (1,415) but fail to retrieve the secondary explanatory clause describing the explosive ordnance ratio, resulting in generic answers like 'armed clashes'."
+    },
+        {
+      "id": "Q13",
+      "test_type": "Inverse Percentage vs Contextual Reality Trap",
+      "question": "By what percentage did the overall verified grave violations against children decrease compared to the prior reporting period, and does the UN Secretary-General consider this a reflection of improved child safety?",
+      "ground_truth": "Verified grave violations decreased by 38% (totaling 4,582 violations), but the report explicitly states that this should not be interpreted as an overall improvement in the situation of children across the country.",
+      "trick_distractor_challenge": "Tests whether the model captures critical nuance and qualifying statements. Uncalibrated LLMs see a '38% decrease' and falsely conclude that conditions improved for children, ignoring the explicit qualifying caveat."
+    },
+    {
+      "id": "Q14",
+      "test_type": "Recruitment Delta vs Rate Metric Trap",
+      "question": "What was the exact percentage increase in the recruitment and use of children compared to the previous reporting cycle, and what was the minimum age documented among recruited children?",
+      "ground_truth": "Recruitment and use increased by 81% (reaching 557 verified cases), with some children documented as young as 12 years old.",
+      "trick_distractor_challenge": "Requires cross-linking an analytical delta ('81% increase') with an age threshold demographic ('12 years old'). Weak chunkers fragment the statistical trend paragraph from the narrative demographic details."
+    },
+    {
+      "id": "Q15",
+      "test_type": "Sub-Category Disaggregation & Unknown Sex Trap",
+      "question": "Among the 1,415 children killed and maimed, what is the exact breakdown between those killed versus maimed, and how many casualties had an unidentified sex?",
+      "ground_truth": "446 children were killed and 969 were maimed. By sex, 1,094 were boys, 310 were girls, and exactly 11 were of unknown sex.",
+      "trick_distractor_challenge": "Tests high-precision tabular/list parsing across two different categorical axes (casualty status vs. gender). Embeddings often omit tiny residual buckets like '11 unknown sex' or conflate killed (446) with maimed (969)."
+    },
+    {
+      "id": "Q16",
+      "test_type": "Abduction Attribution & Gender Ratio Trap",
+      "question": "How many total children were verified as abducted during the 2023–2025 cycle, what was the gender distribution, and which entity perpetrated all of them?",
+      "ground_truth": "7 children were verified as abducted (2 boys and 5 girls), and all 7 abductions were attributed exclusively to the Taliban.",
+      "trick_distractor_challenge": "The small absolute number (7) is easily lost as noise across embedding vectors. Inverted gender ratios (more girls than boys, unlike recruitment where all were boys) frequently cause hallucination in generalized summaries."
+    },
+    {
+      "id": "Q17",
+      "test_type": "Geopolitical Cross-Border Causality Trap",
+      "question": "Which specific bilateral cross-border hostilities were highlighted in the report as increasingly impacting the safety and rights of Afghan children?",
+      "ground_truth": "Heightened cross-border hostilities between Afghanistan and Pakistan.",
+      "trick_distractor_challenge": "Tests domain precision without falling back on historical priors. LLMs often pull from pre-2021 training weights and hallucinate US/NATO airstrikes or internal coalition conflicts rather than citing cross-border clashes with Pakistan."
+    },
+    {
+      "id": "Q18",
+      "test_type": "Official Attribution & Mandate Trap",
+      "question": "Who served as the Special Representative of the Secretary-General for Children and Armed Conflict quoted in this report regarding the danger of unexploded ordnance?",
+      "ground_truth": "Under-Secretary-General Vanessa Frazier.",
+      "trick_distractor_challenge": "Named-entity replacement trap. Models frequently hallucinate earlier mandate holders (such as Virginia Gamba or Radhika Coomaraswamy) from general parametric memory rather than retrieving the exact name quoted in S/2026/728."
+    },
+    {
+      "id": "Q19",
+      "test_type": "Fine-Grained Violation Hierarchy Trap",
+      "question": "What was the single most frequently verified grave violation against children documented in document S/2026/728, and what ranked as the second most frequent?",
+      "ground_truth": "The most verified violation was the denial of humanitarian access (2,241 incidents), followed by the killing and maiming of children (1,415 children).",
+      "trick_distractor_challenge": "Because killing and maiming receives the heaviest qualitative narrative focus, LLMs routinely predict it as the rank-1 violation by frequency unless the retriever correctly isolates the comparative quantitative summary."
+    }
+  ]
+}
