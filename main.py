@@ -13,15 +13,32 @@ from app.llm import model
 from app.memory import SessionManager
 from app.services import ResumeAssistant, IngestionService, DatabaseService
 
+# model improving
+
+try:
+    from langchain_classic.retrievers import ContextualCompressionRetriever
+except ImportError:
+    from langchain.retrievers.contextual_compression import ContextualCompressionRetriever
+
+from app.reranker import JinaReranker # <-- NEW IMPORT
+
 print("Initializing RAG Assistant...")
 
 # Initialize Vector Store
 vector_store = pinecone_manager.get_vector_store(embedding_model=embed_model.embedding_model)
-retriever = vector_store.as_retriever(search_kwargs={"k": 3})
+# retriever = vector_store.as_retriever(search_kwargs={"k": 3})
+base_retriever = vector_store.as_retriever(search_kwargs={"k": 10})
+
+compressor = JinaReranker(top_n=3)
+retriever = ContextualCompressionRetriever(
+    base_compressor=compressor,
+    base_retriever=base_retriever
+)
+
 
 # Initialize Services
 session_manager = SessionManager(llm=model.llm, max_tokens=1200, summary_trigger=10, keep_last_n=4)
-assistant = ResumeAssistant(llm=model.llm, retriever=retriever)
+assistant = ResumeAssistant(llm=model.llm, retriever=base_retriever)
 ingestion_service = IngestionService(vector_store=vector_store)
 db_service = DatabaseService(database_url=settings.DATABASE_URL)
 

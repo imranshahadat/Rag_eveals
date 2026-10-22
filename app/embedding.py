@@ -27,7 +27,6 @@ class VercelEmbeddings:
                 model=self.model_name,
                 openai_api_key=self.api_key,
                 openai_api_base=self.base_url,
-                # Add this to ensure it handles single strings correctly
                 check_embedding_ctx_length=False, 
             )
             print(f"Vercel AI Gateway embedding model ({self.model_name}) initialized successfully")

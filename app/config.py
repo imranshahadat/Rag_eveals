@@ -27,7 +27,7 @@ class Settings:
     PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "rag-eveals-index-v2")
     PINECONE_NAMESPACE = os.getenv("PINECONE_NAMESPACE", "documents")
     PINECONE_DIMENSION = int(os.getenv("PINECONE_DIMENSION", "2048")) # Updated to 2048
-
+    JINA_API_KEY = os.getenv("JINA_API_KEY")
     # Database
     DATABASE_URL = os.getenv("DATABASE_URL")
 

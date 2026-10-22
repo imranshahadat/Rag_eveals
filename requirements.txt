@@ -9,3 +9,8 @@ langchain-pinecone
 pinecone
 pypdf
 langsmith
+deepeval
+langchain-upstage
+langchain-core
+langchain-community
+

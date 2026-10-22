@@ -7,14 +7,14 @@ from app.logger import log_msg, error_msg
 
 class DocumentSplitter:
     @traceable(name="Document Splitter", run_type="tool", tags=["splitter"])
-    def split_and_index(self, documents, vectorstore, chunk_size=1000, chunk_overlap=200):
+    def split_and_index(self, documents, vectorstore, chunk_size=800, chunk_overlap=150):
         from langchain_text_splitters import RecursiveCharacterTextSplitter
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
         all_splits = text_splitter.split_documents(documents)
         print(f"Split documents into {len(all_splits)} chunks.")
         
         if not all_splits:
-            print("⚠️ No chunks to index. Check if documents are empty.")
+            print("No chunks to index. Check if documents are empty.")
             return 0
             
         vectorstore.add_documents(documents=all_splits)
@@ -85,7 +85,7 @@ class IngestionService:
         print(f"Scanning directory: {folder_path}")
         documents = self.loader.load_directory(folder_path)
         if not documents:
-            print("⚠️ No documents found in the directory.")
+            print("No documents found in the directory.")
             return 0
         return self.splitter.split_and_index(documents=documents, vectorstore=self.vector_store)
 
